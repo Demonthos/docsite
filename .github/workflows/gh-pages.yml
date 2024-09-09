@@ -25,18 +25,16 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
       - uses: cargo-bins/cargo-binstall@main
       - name: Install CLI
-        run: cargo binstall dioxus-cli -y --force
+        run: cargo install --git https://github.com/ealmloff/dioxus --branch fix-static-generation dioxus-cli
       - name: Build
-        run: dx serve --release --features fullstack
-      - name: Build Static HTML
-        run: cargo run --release --features prebuild
+        run: dx serve --release --features fullstack --server-feature prebuild
       - name: Rebuild with search index
-        # rebuild web with the new search index and copy over the wasm file into the docs folder
-        run: dx build --release --features web && mv dist/assets/dioxus docs/assets/dioxus
+        # rebuild with the new search index
+        run: dx serve --release --features fullstack --server-feature prebuild
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.2.3
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs # The folder the action should deploy.
           target-folder: .
-          clean: false # don't scrub docs
+          clean: true # don't scrub docs
